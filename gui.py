@@ -8,9 +8,12 @@ import sys
 import time
 
 #TODO Schriftgroesse, Abstaende(fill)
+from scanner.scan import scanner
+
 
 class ScannerGui():
     def __init__(self):
+        self.initializeScanner()
 
         self.window = Tk()
         self.window.geometry('300x400')
@@ -30,8 +33,15 @@ class ScannerGui():
         self.scannerlabel.pack(anchor=W, expand=1, fill=BOTH)
         
         self.combo = Combobox(self.masterFrame)
-        self.combo['values'] = ("Scanner1", "Scanner2", "Scanner3")
-        self.combo.current(1)  # set the selected item
+        device_descriptors = self.scanner.get_device_descriptors(self.scannerapi)#
+        self.devices = {}
+        for device_descriptor in device_descriptors:
+            self.devices[self.scanner.get_device_name(device_descriptor)] = device_descriptor
+
+        self.combo['values'] = list(self.devices.keys())
+        if len(self.devices) > 0:
+            self.combo.current(0)# set the selected item
+
         self.combo.pack(anchor=W, pady=(5, 10), expand=1, fill=BOTH)
 
         # Radiobutton to choose quality
@@ -95,8 +105,12 @@ class ScannerGui():
         self.progressbarlabel.pack(anchor=W, pady=(15, 0), expand=1, fill=BOTH)
         self.progressbar.pack(anchor=W, expand=1, fill=BOTH)
         self.startButton.pack(anchor=W, pady=(35,0), padx=100, expand=1, fill=BOTH)
-        
-        
+        selected_device_descriptor = self.devices[self.combo.get()]
+        selected_device = self.scanner.get_device_object(self.scannerapi, selected_device_descriptor)
+        sources = self.scanner.get_scan_sources(selected_device)
+        self.scanner.scan(sources[0], "C:\\Users\\Technician\\out.png")
+
+
         self.window.update()
         time.sleep(1)
         self.progressbar['value'] = 20
@@ -108,6 +122,10 @@ class ScannerGui():
         self.progressbar['value'] = 100
         self.window.update()
 
+
+    def initializeScanner(self):
+        self.scanner = scanner()
+        self.scannerapi = self.scanner.init_api()
 
 
 app = ScannerGui()

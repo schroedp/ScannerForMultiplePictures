@@ -10,6 +10,7 @@ from gi.repository import Libinsane
 
 
 class scanner:
+
     def init_api(self):
         return Libinsane.Api.new_safebet()  # Initialisieren der API, returns api object
 
@@ -155,7 +156,7 @@ class scanner:
                 if out is not None:
                     print("Saving page as {} ...".format(out))
                     if scan_params.get_format() == Libinsane.ImgFormat.RAW_RGB_24:
-                        img = scanner.raw_to_img(scan_params, img)
+                        img = self.raw_to_img(scan_params, img)
                         img.save(out, format="PNG")
                     else:
                         print("Warning: output format is {}".format(
