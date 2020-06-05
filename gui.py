@@ -5,6 +5,9 @@ from tkinter.ttk import Progressbar
 from tkinter import ttk
 from tkinter import filedialog
 import sys
+import time
+
+#TODO Schriftgroesse, Abstaende(fill)
 
 class ScannerGui():
     def __init__(self):
@@ -20,14 +23,13 @@ class ScannerGui():
         self.exportValue = BooleanVar()
         self.exportValue.set(False)  # set check state
         self.expert = Checkbutton(self.masterFrame, text='Expert mode', var=self.exportValue, command=lambda: self.showexpertmode())
-        self.expert.pack(anchor=W, ipady=5, pady=(0, 10), expand=1, fill=BOTH)
-        #self.expert.config(font=("Courier", 20))
+        self.expert.pack(anchor=W, expand=1, fill=BOTH)
 
         # combobox widget to choose the scanner
         self.scannerlabel = Label(self.masterFrame, text="Scanner")
         self.scannerlabel.pack(anchor=W, expand=1, fill=BOTH)
+        
         self.combo = Combobox(self.masterFrame)
-
         self.combo['values'] = ("Scanner1", "Scanner2", "Scanner3")
         self.combo.current(1)  # set the selected item
         self.combo.pack(anchor=W, pady=(5, 10), expand=1, fill=BOTH)
@@ -51,13 +53,12 @@ class ScannerGui():
 
         # progressbar
         self.progressbarlabel = Label(self.masterFrame, text="Progress")
-        self.progressbarlabel.pack(anchor=W, pady=(15, 0), expand=1, fill=BOTH)
-
+        
         self.progressbarstyle = ttk.Style()
         self.progressbarstyle.configure("black.Horizontal.TProgressbar", background='black')
         self.progressbar = Progressbar(self.masterFrame, length=200, style='black.Horizontal.TProgressbar')
-        self.progressbar['value'] = 70
-        self.progressbar.pack(anchor=W, pady=(5, 0), expand=1, fill=BOTH)
+        self.progressbar['value'] = 0
+        
 
         #Start button
         self.startButton = Button(self.masterFrame, text ="Start",command=self.start)
@@ -72,9 +73,9 @@ class ScannerGui():
         if self.exportValue.get() == TRUE:
             self.startButton.pack_forget()
             self.qualitylabel.pack(anchor=W, expand=1)
-            self.qualityrad1.pack(anchor=W, ipady=3, expand=1, fill=BOTH)
-            self.qualityrad2.pack(anchor=W, ipady=3, expand=1, fill=BOTH)
-            self.qualityrad3.pack(anchor=W, ipady=3, expand=1, fill=BOTH)
+            self.qualityrad1.pack(anchor=W, ipady=1, expand=1, fill=BOTH)
+            self.qualityrad2.pack(anchor=W, ipady=1, expand=1, fill=BOTH)
+            self.qualityrad3.pack(anchor=W, ipady=1, expand=1, fill=BOTH)
             self.startButton.pack(anchor=W, pady=(35,0), padx=100, expand=1, fill=BOTH)
             self.window.geometry('300x450')
         else:
@@ -86,11 +87,27 @@ class ScannerGui():
             self.window.update()
 
     def browsefunc(self):
-        filename = filedialog.askopenfilename(filetypes=(("tiff files", "*.tiff"), ("All files", "*.*")))
+        filename = filedialog.askopenfilename(filetypes=(("tiff files, jpeg files, png files", "*.tiff, *.jpeg. *.png"), ("All files", "*.*")))
         self.filepath.insert(END, filename)
 
     def start(self):
-        sys.exit()
+        self.startButton.pack_forget()
+        self.progressbarlabel.pack(anchor=W, pady=(15, 0), expand=1, fill=BOTH)
+        self.progressbar.pack(anchor=W, expand=1, fill=BOTH)
+        self.startButton.pack(anchor=W, pady=(35,0), padx=100, expand=1, fill=BOTH)
+        
+        
+        self.window.update()
+        time.sleep(1)
+        self.progressbar['value'] = 20
+        self.window.update()
+        time.sleep(1)
+        self.progressbar['value'] = 60
+        self.window.update()
+        time.sleep(1)
+        self.progressbar['value'] = 100
+        self.window.update()
+
 
 
 app = ScannerGui()
