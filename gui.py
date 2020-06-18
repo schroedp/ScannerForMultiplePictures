@@ -22,6 +22,7 @@ class ScannerGui():
         self.initializeScanner()
 
         self.window = Tk()
+        self.window.title("SCANNERGY")
         self.window.geometry('300x400')
         self.window.minsize(300, 400)
 
