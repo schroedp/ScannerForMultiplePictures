@@ -11,7 +11,7 @@ class Extractor(object):
     def extract(self, image):
         if self.debug: imdbg = image.copy()
         grayscale = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        threshold = cv2.threshold(grayscale, 225, 255, cv2.THRESH_BINARY_INV)[1]
+        threshold = cv2.threshold(grayscale, 240, 255, cv2.THRESH_BINARY_INV)[1]
         contours, _ = cv2.findContours(threshold, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         results = list()
 
@@ -37,6 +37,7 @@ class Extractor(object):
                 cv2.imshow(f"DEBUG: Result {i}", self._resize(result, width=1000))
             results.append(result)
 
+
         if self.debug:
             cv2.imshow("DEBUG: Image", self._resize(imdbg, width=1000))
             cv2.imshow("DEBUG: Grayscale", self._resize(threshold, width=1000))
@@ -46,6 +47,7 @@ class Extractor(object):
         time = time.strftime("%Y-%m-%d_%H-%M")
         for i, result in enumerate(results):
             cv2.imwrite(f"{self.path}/scan_{time}_{i}.png", result)
+        return len(results)
 
     def _resize(self, image, width=None, height=None, inter=cv2.INTER_AREA):
         h, w = image.shape[:2]
