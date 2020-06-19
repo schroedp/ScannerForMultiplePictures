@@ -1,9 +1,9 @@
 from tkinter import *
 from tkinter import ttk
+from tkinter import filedialog
+import tkinter.font as tkFont
 from tkinter.ttk import *
 from tkinter.ttk import Progressbar
-from tkinter import ttk
-from tkinter import filedialog
 import sys
 import time
 
@@ -23,21 +23,24 @@ class ScannerGui():
 
         self.window = Tk()
         self.window.title("SCANNERGY")
-        self.window.geometry('300x400')
-        self.window.minsize(300, 400)
+        self.window.geometry('300x350')
+        self.window.minsize(300, 350)
+        self.window.maxsize(1500, 800)
+
+        fontStyle = tkFont.Font(size=12)
 
         self.masterFrame = Frame(self.window)
-        self.masterFrame.pack(padx=(20, 20), pady=(5, 5), expand=1, fill=BOTH)
+        self.masterFrame.pack(padx=(20, 20), pady=(20, 20), expand=0, fill=BOTH)
 
         # Checkbutton for expert mode
         self.exportValue = BooleanVar()
         self.exportValue.set(False)  # set check state
         self.expert = Checkbutton(self.masterFrame, text='Expert mode', var=self.exportValue, command=lambda: self.showexpertmode())
-        self.expert.pack(anchor=W, expand=1, fill=BOTH)
+        self.expert.pack(anchor=W, pady=(0, 18), expand=1, fill=X)
 
         # combobox widget to choose the scanner
-        self.scannerlabel = Label(self.masterFrame, text="Scanner")
-        self.scannerlabel.pack(anchor=W, expand=1, fill=BOTH)
+        self.scannerlabel = Label(self.masterFrame, text="Choose scanner", font=fontStyle)
+        self.scannerlabel.pack(anchor=W, expand=0, fill=X)
         
         self.combo = Combobox(self.masterFrame)
         self.combo.bind("<<ComboboxSelected>>", self.changeScanner)
@@ -50,66 +53,69 @@ class ScannerGui():
         if len(self.devices) > 0:
             self.combo.current(0)# set the selected item
 
-        self.combo.pack(anchor=W, pady=(5, 10), expand=1, fill=BOTH)
+        self.combo.pack(anchor=W, pady=(5, 18), expand=0, fill=X)
 
         # scan source selection
+        self.sourcelabel = Label(self.masterFrame, text="Choose scanner type", font=fontStyle)
+        self.sourcelabel.pack(anchor=W, expand=0, fill=X)
+
         self.scanSources = Combobox(self.masterFrame)
         self.scanSources.bind("<<ComboboxSelected>>", self.updateOptions)
-        selected_device_descriptor = self.devices[self.combo.get()]
-        selected_device = self.scanner.get_device_object(self.scannerapi, selected_device_descriptor)
-        sources = self.scanner.get_scan_sources(selected_device)
-        self.sourceNames = {}
-        for source in sources:
-            self.sourceNames[source.get_name()] = source
+        try:
+            selected_device_descriptor = self.devices[self.combo.get()]
+            selected_device = self.scanner.get_device_object(self.scannerapi, selected_device_descriptor)
+            sources = self.scanner.get_scan_sources(selected_device)
+            self.sourceNames = {}
+            for source in sources:
+                self.sourceNames[source.get_name()] = source
 
-        self.scanSources['values'] = list(self.sourceNames.keys())
-        if len(self.sourceNames) > 0:
-            self.scanSources.current(0)
+            self.scanSources['values'] = list(self.sourceNames.keys())
+            if len(self.sourceNames) > 0:
+                self.scanSources.current(0)
+        except:
+            print("Error, no Scanner")
 
-
-
-
-        self.scanSources.pack(anchor=W, pady=(5, 10), expand=1, fill=BOTH)
+        self.scanSources.pack(anchor=W, pady=(5, 18), expand=0, fill=X)
 
         # fileinput
-        self.fileinput = Frame(self.masterFrame)
-        self.fileinput.pack(anchor=W, pady=(10, 0), expand=1, fill=BOTH)
+        self.fileinputlabel = Label(self.masterFrame, text="Choose directory to save pictures", font=fontStyle)
+        self.fileinputlabel.pack(anchor=W, expand=0, fill=X)
 
-        self.uploadButton = Button(self.fileinput, text="Save to...", command=self.browsefunc)
-        self.uploadButton.pack(side=LEFT, expand=1, fill=BOTH)
+        self.fileinput = Frame(self.masterFrame)
+        self.fileinput.pack(anchor=W, pady=(5, 0), expand=0, fill=X)
+
+        self.saveButton = Button(self.fileinput, text="Save to...", command=self.browsefunc)
+        self.saveButton.pack(side=LEFT)
 
         self.filepath = Entry(self.fileinput)
-        self.filepath.pack(side=LEFT, ipadx=20, expand=1, fill=BOTH)
+        self.filepath.pack(side=LEFT, ipadx=20, expand=1, fill=X)
 
         # progressbar
-        self.progressbarlabel = Label(self.masterFrame, text="Progress")
+        self.progressbarlabel = Label(self.masterFrame, text="Scan progress", font=fontStyle)
         
         self.progressbarstyle = ttk.Style()
         self.progressbarstyle.configure("black.Horizontal.TProgressbar", background='black')
         self.progressbar = Progressbar(self.masterFrame, length=200, style='black.Horizontal.TProgressbar')
         self.progressbar['value'] = 0
 
-        self.brightnesslabel = Label(self.masterFrame, text="Brightness")
+        self.brightnesslabel = Label(self.masterFrame, text="Brightness", font=fontStyle)
         ScannerGui.brightness = Scale(self.masterFrame, from_=0, to=200, orient=HORIZONTAL)
-        self.contrastlabel = Label(self.masterFrame, text="Contrast")
+        self.contrastlabel = Label(self.masterFrame, text="Contrast", font=fontStyle)
         ScannerGui.contrast = Scale(self.masterFrame, from_=0, to=200, orient=HORIZONTAL)
-        self.resolutionlabel = Label(self.masterFrame, text="Resolution")
+        self.resolutionlabel = Label(self.masterFrame, text="Resolution", font=fontStyle)
         ScannerGui.resolution = Combobox(self.masterFrame)
-        self.modelabel = Label(self.masterFrame, text="Color Mode")
+        self.modelabel = Label(self.masterFrame, text="Color Mode", font=fontStyle)
         ScannerGui.mode = Combobox(self.masterFrame)
-        self.depthlabel = Label(self.masterFrame, text="Color Depth")
+        self.depthlabel = Label(self.masterFrame, text="Color Depth", font=fontStyle)
         ScannerGui.depth = Combobox(self.masterFrame)
 
         #Start button
-        self.startButton = Button(self.masterFrame, text ="Start",command=self.start)
-        self.startButton.pack(anchor=W, pady=(35,0), padx=100, expand=1, fill=BOTH)
+        self.startButton = Button(self.masterFrame, text="Start", command=self.start)
+        self.startButton.pack(anchor=CENTER, pady=(35,0))
 
         self.updateOptions(None)
 
         self.window.mainloop()
-
-
-
 
     def quit(self):
         self.window.destroy()
@@ -117,18 +123,21 @@ class ScannerGui():
     def showexpertmode(self):
         if self.exportValue.get() == TRUE:
             self.startButton.pack_forget()
-            self.brightnesslabel.pack(anchor=W, expand=1, fill=BOTH)
-            ScannerGui.brightness.pack(anchor=W, expand=1, fill=BOTH)
-            self.contrastlabel.pack(anchor=W, expand=1, fill=BOTH)
-            ScannerGui.contrast.pack(anchor=W, expand=1, fill=BOTH)
-            self.resolutionlabel.pack(anchor=W, expand=1, fill=BOTH)
-            ScannerGui.resolution.pack(anchor=W, expand=1, fill=BOTH)
-            self.modelabel.pack(anchor=W, expand=1, fill=BOTH)
-            ScannerGui.mode.pack(anchor=W, expand=1, fill=BOTH)
-            self.depthlabel.pack(anchor=W, expand=1, fill=BOTH)
-            ScannerGui.depth.pack(anchor=W, expand=1, fill=BOTH)
-            self.startButton.pack(anchor=W, pady=(35,0), padx=100, expand=1, fill=BOTH)
-            self.window.geometry('300x450')
+            self.progressbarlabel.forget()
+            self.progressbar.forget()
+            self.progressbar['value'] = 0
+            self.brightnesslabel.pack(anchor=W, pady=(18,5), expand=0, fill=X)
+            ScannerGui.brightness.pack(anchor=W, expand=0, fill=X)
+            self.contrastlabel.pack(anchor=W, pady=(10,5), expand=0, fill=X)
+            ScannerGui.contrast.pack(anchor=W, expand=0, fill=X)
+            self.resolutionlabel.pack(anchor=W,pady=(10,5), expand=0, fill=X)
+            ScannerGui.resolution.pack(anchor=W, expand=0, fill=X)
+            self.modelabel.pack(anchor=W,pady=(10,5), expand=0, fill=X)
+            ScannerGui.mode.pack(anchor=W, expand=0, fill=X)
+            self.depthlabel.pack(anchor=W,pady=(10,0), expand=0, fill=X)
+            ScannerGui.depth.pack(anchor=W, expand=0, fill=X)
+            self.startButton.pack(anchor=CENTER, pady=(35,0))
+            self.window.geometry('300x650')
 
         else:
             self.brightness.pack_forget()
@@ -141,28 +150,42 @@ class ScannerGui():
             self.resolutionlabel.pack_forget()
             self.modelabel.pack_forget()
             self.contrastlabel.pack_forget()
-            self.window.geometry('300x400')
+            self.progressbarlabel.forget()
+            self.progressbar.forget()
+            self.progressbar['value'] = 0
+            self.startButton.forget()
+            self.startButton.pack(anchor=CENTER, pady=(35,0))
+            self.window.geometry('300x350')
             self.window.update()
 
     def browsefunc(self):
-        filename = filedialog.askopenfilename(filetypes=(("tiff files, jpeg files, png files", "*.tiff, *.jpeg. *.png"), ("All files", "*.*")))
+        filename = filedialog.askdirectory()
         self.filepath.insert(END, filename)
 
     def start(self):
         self.startButton.pack_forget()
-        self.progressbarlabel.pack(anchor=W, pady=(15, 0), expand=1, fill=BOTH)
-        self.progressbar.pack(anchor=W, expand=1, fill=BOTH)
-        self.startButton.pack(anchor=W, pady=(35,0), padx=100, expand=1, fill=BOTH)
-        print(ScannerGui.mode.get())
-        self.scanner.set_option(self.sourceNames[self.scanSources.get()], "mode", ScannerGui.mode.get())
-        self.scanner.set_option(self.sourceNames[self.scanSources.get()], "resolution", ScannerGui.resolution.get())
-        self.scanner.set_option(self.sourceNames[self.scanSources.get()], "brightness", ScannerGui.brightness.get())
-        print(ScannerGui.brightness.get())
-        self.scanner.set_option(self.sourceNames[self.scanSources.get()], "contrast", ScannerGui.contrast.get())
-        print(ScannerGui.contrast.get())
-        self.scanner.set_option(self.sourceNames[self.scanSources.get()], "depth", ScannerGui.depth.get())
-        self.scanner.scan(self.sourceNames[self.scanSources.get()], "C:\\Users\\Technician\\out.png")
+        self.progressbarlabel.pack(anchor=W, pady=(18, 5), expand=0, fill=X)
+        self.progressbar.pack(anchor=W, expand=0, fill=X)
+        self.startButton.pack(anchor=CENTER, pady=(35,0))
+        try: 
+            print(ScannerGui.mode.get())
+            self.scanner.set_option(self.sourceNames[self.scanSources.get()], "mode", ScannerGui.mode.get())
+            self.scanner.set_option(self.sourceNames[self.scanSources.get()], "resolution", ScannerGui.resolution.get())
+            self.scanner.set_option(self.sourceNames[self.scanSources.get()], "brightness", ScannerGui.brightness.get())
+            print(ScannerGui.brightness.get())
+            self.scanner.set_option(self.sourceNames[self.scanSources.get()], "contrast", ScannerGui.contrast.get())
+            print(ScannerGui.contrast.get())
+            self.scanner.set_option(self.sourceNames[self.scanSources.get()], "depth", ScannerGui.depth.get())
+            self.scanner.scan(self.sourceNames[self.scanSources.get()], "C:\\Users\\Technician\\out.png")
+        except:
+            print("Error, no Scanner")
 
+
+        if self.exportValue.get() == TRUE:
+            self.window.geometry('300x700')
+        else:
+            self.window.geometry('300x400')
+        
 
         self.window.update()
         time.sleep(1)
@@ -175,44 +198,48 @@ class ScannerGui():
         self.progressbar['value'] = 100
         self.window.update()
 
-
     def initializeScanner(self):
         self.scanner = scanner()
         self.scannerapi = self.scanner.init_api()
 
-
     def changeScanner(self, event):
-        selected_device_descriptor = self.devices[self.combo.get()]
-        selected_device = self.scanner.get_device_object(self.scannerapi, selected_device_descriptor)
-        sources = self.scanner.get_scan_sources(selected_device)
-        sourceNames = {}
-        for source in sources:
-            sourceNames[source.get_name()] = source
+        try:
+            selected_device_descriptor = self.devices[self.combo.get()]
+            selected_device = self.scanner.get_device_object(self.scannerapi, selected_device_descriptor)
+            sources = self.scanner.get_scan_sources(selected_device)
+            sourceNames = {}
+            for source in sources:
+                sourceNames[source.get_name()] = source
 
-        self.scanSources['values'] = list(sourceNames.keys())
-        if len(sourceNames) > 0:
-            self.scanSources.current(0)
+            self.scanSources['values'] = list(sourceNames.keys())
+            if len(sourceNames) > 0:
+                self.scanSources.current(0)
+        except:
+            print("Error, no Scanner")
 
     def updateOptions(self, event):
-        selectedSource = self.sourceNames[self.scanSources.get()]
-        options = self.scanner.get_options(selectedSource)
+        try: 
+            selectedSource = self.sourceNames[self.scanSources.get()]
+            options = self.scanner.get_options(selectedSource)
 
-        self.optionNames = {}
-        for option in options:
-            self.optionNames[option.get_name()] = option
-            try:
-                attribute = getattr(self, option.get_name())
-                if attribute is not None:
-                    if isinstance(attribute, Scale):
-                        attribute.configure(to=option.get_constraint()[1])
-                        attribute.configure(from_=option.get_constraint()[0])
-                        attribute.set(option.get_value())
-                    else:
-                        attribute['values'] = option.get_constraint()
-                        attribute.current(option.get_constraint().index(option.get_value()))
-                        print(attribute)
-            except AttributeError as error:
-                print(error)
+            self.optionNames = {}
+            for option in options:
+                self.optionNames[option.get_name()] = option
+                try:
+                    attribute = getattr(self, option.get_name())
+                    if attribute is not None:
+                        if isinstance(attribute, Scale):
+                            attribute.configure(to=option.get_constraint()[1])
+                            attribute.configure(from_=option.get_constraint()[0])
+                            attribute.set(option.get_value())
+                        else:
+                            attribute['values'] = option.get_constraint()
+                            attribute.current(option.get_constraint().index(option.get_value()))
+                            print(attribute)
+                except AttributeError as error:
+                    print(error)
+        except:
+            print("Error, no Scanner")
 
 app = ScannerGui()
 
