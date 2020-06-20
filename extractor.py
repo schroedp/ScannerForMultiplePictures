@@ -9,7 +9,7 @@ class Extractor(object):
         self.debug = debug
 
     def extract(self, image):
-        buffer = int(len(image) * 0.05)
+        buffer = int(len(image) * 0.01)
         image = image[buffer:-buffer][buffer:-buffer]
         if self.debug: imdbg = image.copy()
         grayscale = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
