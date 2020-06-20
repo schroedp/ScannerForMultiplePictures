@@ -6,6 +6,8 @@ from tkinter.ttk import *
 from tkinter.ttk import Progressbar
 import sys
 import time
+from extractor import Extractor
+import cv2
 
 #TODO Schriftgroesse, Abstaende(fill)
 from scanner.scan import scanner
@@ -176,7 +178,12 @@ class ScannerGui():
             self.scanner.set_option(self.sourceNames[self.scanSources.get()], "contrast", ScannerGui.contrast.get())
             print(ScannerGui.contrast.get())
             self.scanner.set_option(self.sourceNames[self.scanSources.get()], "depth", ScannerGui.depth.get())
-            self.scanner.scan(self.sourceNames[self.scanSources.get()], "C:\\Users\\Technician\\out.png")
+            #self.scanner.set_option(self.sourceNames[self.scanSources.get()], "dps_page_size", "iso_a4")
+            self.scanner.scan(self.sourceNames[self.scanSources.get()], "./temp.png")
+
+            extracted = Extractor(".", True).extract(cv2.imread("./temp.png"))
+            print("Extracted " + extracted + " Images.")
+
         except:
             print("Error, no Scanner")
 

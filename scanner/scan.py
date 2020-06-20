@@ -2,7 +2,9 @@ import sys
 import traceback
 
 from PIL import Image
+import numpy
 import gi
+
 
 gi.require_version("Libinsane", "1.0")
 
@@ -156,6 +158,7 @@ class scanner:
                 if out is not None:
                     print("Saving page as {} ...".format(out))
                     if scan_params.get_format() == Libinsane.ImgFormat.RAW_RGB_24:
+                        print("Reached Extraction:")
                         img = self.raw_to_img(scan_params, img)
                         img.save(out, format="PNG")
                     else:
