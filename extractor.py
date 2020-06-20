@@ -9,9 +9,11 @@ class Extractor(object):
         self.debug = debug
 
     def extract(self, image):
+        buffer = int(len(image) * 0.05)
+        image = image[buffer:-buffer][buffer:-buffer]
         if self.debug: imdbg = image.copy()
         grayscale = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        threshold = cv2.threshold(grayscale, 240, 255, cv2.THRESH_BINARY_INV)[1]
+        threshold = cv2.threshold(grayscale, 228, 255, cv2.THRESH_BINARY_INV)[1]
         contours, _ = cv2.findContours(threshold, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         results = list()
 
@@ -34,13 +36,13 @@ class Extractor(object):
             trans = cv2.getPerspectiveTransform(old, new)
             result = cv2.warpPerspective(image, trans, (w,h))
             if self.debug:
-                cv2.imshow(f"DEBUG: Result {i}", self._resize(result, width=1000))
+                cv2.imshow(f"DEBUG: Result {i}", self._resize(result, width=600))
             results.append(result)
 
 
         if self.debug:
-            cv2.imshow("DEBUG: Image", self._resize(imdbg, width=1000))
-            cv2.imshow("DEBUG: Grayscale", self._resize(threshold, width=1000))
+            cv2.imshow("DEBUG: Image", self._resize(imdbg, width=600))
+            cv2.imshow("DEBUG: Grayscale", self._resize(threshold, width=600))
             cv2.waitKey(0)
 
         time = datetime.datetime.now()
@@ -88,5 +90,5 @@ class Extractor(object):
 
 if __name__ == "__main__":
     ext = Extractor(".", True)
-    image = cv2.imread("testscan.png")
+    image = cv2.imread("out.png")
     ext.extract(image)
