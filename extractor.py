@@ -9,11 +9,11 @@ class Extractor(object):
         self.debug = debug
 
     def extract(self, image):
-        buffer = int(len(image) * 0.05)
+        buffer = int(len(image) * 0.03)
         image = image[buffer:-buffer][buffer:-buffer]
         if self.debug: imdbg = image.copy()
         grayscale = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        threshold = cv2.threshold(grayscale, 228, 255, cv2.THRESH_BINARY_INV)[1]
+        threshold = cv2.threshold(grayscale, 229, 255, cv2.THRESH_BINARY_INV)[1]
         contours, _ = cv2.findContours(threshold, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         results = list()
 
